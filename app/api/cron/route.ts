@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
         
         if (!scan) continue
         
-        const platforms: ('chatgpt' | 'perplexity')[] = ['chatgpt']
+        const platforms: ('claude' | 'perplexity')[] = ['claude']
         if (process.env.PERPLEXITY_API_KEY) platforms.push('perplexity')
         
         const results = await runGeoScan(

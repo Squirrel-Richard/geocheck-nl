@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     }
     
     // Determine platforms based on plan
-    const platforms: ('chatgpt' | 'perplexity')[] = ['chatgpt']
+    const platforms: ('claude' | 'perplexity')[] = ['claude']
     if (plan !== 'gratis' && process.env.PERPLEXITY_API_KEY) {
       platforms.push('perplexity')
     }

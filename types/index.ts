@@ -31,7 +31,8 @@ export interface Scan {
 }
 
 export interface PlatformResults {
-  chatgpt?: PlatformData
+  claude?: PlatformData
+  chatgpt?: PlatformData  // legacy
   perplexity?: PlatformData
   gemini?: PlatformData
 }

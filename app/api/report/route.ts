@@ -109,7 +109,6 @@ function buildEmailHtml(business: Record<string, unknown>, scan: Record<string, 
 }
 
 export async function POST(req: NextRequest) {
-  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { business_id, scan_id } = await req.json()
     
@@ -145,16 +144,22 @@ export async function POST(req: NextRequest) {
     
     const html = buildEmailHtml(business, scan)
     
-    const { error: emailError } = await resend.emails.send({
-      from: process.env.RESEND_FROM || 'rapport@geocheck.nl',
-      to: business.report_email,
-      subject: `📊 GEO Rapport — ${business.name} — Score: ${scan.geo_score}/100`,
-      html,
-    })
-    
-    if (emailError) {
-      console.error('Email send error:', emailError)
-      return NextResponse.json({ error: 'E-mail versturen mislukt' }, { status: 500 })
+    // Defensive Resend: only send if API key is configured
+    if (process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY)
+      const { error: emailError } = await resend.emails.send({
+        from: process.env.RESEND_FROM || 'rapport@geocheck.nl',
+        to: business.report_email,
+        subject: `📊 GEO Rapport — ${business.name} — Score: ${scan.geo_score}/100`,
+        html,
+      })
+      
+      if (emailError) {
+        console.error('Email send error:', emailError)
+        return NextResponse.json({ error: 'E-mail versturen mislukt' }, { status: 500 })
+      }
+    } else {
+      console.warn('RESEND_API_KEY not configured — skipping email send')
     }
     
     await supabase
@@ -163,7 +168,7 @@ export async function POST(req: NextRequest) {
         business_id,
         scan_id,
         email: business.report_email,
-        status: 'sent',
+        status: process.env.RESEND_API_KEY ? 'sent' : 'skipped_no_key',
       })
     
     return NextResponse.json({ success: true })

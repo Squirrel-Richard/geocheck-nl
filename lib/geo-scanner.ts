@@ -1,8 +1,8 @@
-import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
 import { RawResult, Suggestion } from '@/types'
 
-function getOpenAI() {
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' })
+function getAnthropic() {
+  return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'placeholder' })
 }
 
 // Generate 50 relevant Dutch questions for a business
@@ -89,23 +89,19 @@ export function generateQuestions(name: string, category: string, city: string):
   return templates.slice(0, 50)
 }
 
-// Query ChatGPT/OpenAI
-async function queryOpenAI(question: string, businessName: string): Promise<{ response: string; mentioned: boolean; sentiment: 'positief' | 'neutraal' | 'negatief' }> {
+// Query Claude (replaces ChatGPT/OpenAI)
+async function queryClaude(question: string, businessName: string): Promise<{ response: string; mentioned: boolean; sentiment: 'positief' | 'neutraal' | 'negatief' }> {
   try {
-    const completion = await getOpenAI().chat.completions.create({
-      model: 'gpt-4o-mini',
+    const message = await getAnthropic().messages.create({
+      model: 'claude-3-5-haiku-20241022',
+      max_tokens: 300,
+      system: 'Je bent een behulpzame AI-assistent die vragen beantwoordt over Nederlandse bedrijven en diensten. Geef eerlijke, informatieve antwoorden.',
       messages: [
-        {
-          role: 'system',
-          content: 'Je bent een behulpzame AI-assistent die vragen beantwoordt over Nederlandse bedrijven en diensten. Geef eerlijke, informatieve antwoorden.'
-        },
         { role: 'user', content: question }
       ],
-      max_tokens: 300,
-      temperature: 0.7,
     })
     
-    const response = completion.choices[0]?.message?.content || ''
+    const response = message.content[0]?.type === 'text' ? message.content[0].text : ''
     const mentioned = response.toLowerCase().includes(businessName.toLowerCase())
     
     let sentiment: 'positief' | 'neutraal' | 'negatief' = 'neutraal'
@@ -175,14 +171,13 @@ export async function generateSuggestions(
   try {
     const notMentionedQuestions = rawResults.filter(r => !r.mentioned).map(r => r.question).slice(0, 10).join('\n')
     
-    const completion = await getOpenAI().chat.completions.create({
-      model: 'gpt-4o-mini',
+    const message = await getAnthropic().messages.create({
+      model: 'claude-3-5-haiku-20241022',
+      max_tokens: 800,
+      system: `Je bent een GEO (Generative Engine Optimization) expert. Geef concrete, actionable adviezen in het Nederlands.
+Je antwoord moet een JSON array zijn met maximaal 5 suggesties, elk met: title, description, impact (1-20 punten score verbetering), effort (laag/medium/hoog), category (content/technisch/links/structuur).
+Antwoord ALLEEN met valid JSON in dit formaat: {"suggestions": [...]}`,
       messages: [
-        {
-          role: 'system',
-          content: `Je bent een GEO (Generative Engine Optimization) expert. Geef concrete, actionable adviezen in het Nederlands.
-Je antwoord moet een JSON array zijn met maximaal 5 suggesties, elk met: title, description, impact (1-20 punten score verbetering), effort (laag/medium/hoog), category (content/technisch/links/structuur).`
-        },
         {
           role: 'user',
           content: `Bedrijf: ${businessName} | Categorie: ${category} | GEO Score: ${score}/100 | Vermelding: ${Math.round(mentionRate * 100)}%
@@ -193,11 +188,10 @@ ${notMentionedQuestions}
 Geef 5 concrete GEO-verbeteringstips in JSON array format.`
         }
       ],
-      response_format: { type: 'json_object' },
-      max_tokens: 800,
     })
     
-    const parsed = JSON.parse(completion.choices[0]?.message?.content || '{"suggestions":[]}')
+    const content = message.content[0]?.type === 'text' ? message.content[0].text : '{}'
+    const parsed = JSON.parse(content)
     return parsed.suggestions || []
   } catch {
     return [
@@ -232,7 +226,7 @@ export async function runGeoScan(
   category: string,
   city: string,
   questionsLimit: number = 10,
-  platforms: ('chatgpt' | 'perplexity')[] = ['chatgpt']
+  platforms: ('claude' | 'perplexity')[] = ['claude']
 ): Promise<{
   geo_score: number
   mention_rate: number
@@ -257,8 +251,8 @@ export async function runGeoScan(
       for (const platform of platforms) {
         let result: { response: string; mentioned: boolean; sentiment: 'positief' | 'neutraal' | 'negatief' }
         
-        if (platform === 'chatgpt') {
-          result = await queryOpenAI(question, businessName)
+        if (platform === 'claude') {
+          result = await queryClaude(question, businessName)
         } else {
           result = await queryPerplexity(question, businessName)
         }

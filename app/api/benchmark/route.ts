@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
           competitor.category || business.category,
           competitor.city || business.city,
           5, // Limited queries for competitors
-          ['chatgpt']
+          ['claude']
         )
         
         const { data: compScan } = await supabase
