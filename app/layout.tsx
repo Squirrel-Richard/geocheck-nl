@@ -5,6 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://geocheck.nl'),
   title: 'GeoCheck.nl — Is jouw bedrijf zichtbaar in AI-zoekmachines?',
   description: 'Check hoe goed ChatGPT, Perplexity en Gemini jouw bedrijf aanbevelen. GEO-score, concurrentie-benchmark en AI-verbeteringstips voor NL bedrijven.',
   keywords: 'GEO, generative engine optimization, AI zoekmachine, ChatGPT ranking, Perplexity zichtbaarheid, AI SEO Nederland, merkzichtbaarheid AI',

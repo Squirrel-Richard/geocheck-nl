@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { createServerClient } from '@/lib/supabase'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+export const dynamic = 'force-dynamic'
 
 function getSentimentEmoji(score: number): string {
   if (score > 0.2) return '😊'
@@ -109,6 +109,7 @@ function buildEmailHtml(business: Record<string, unknown>, scan: Record<string, 
 }
 
 export async function POST(req: NextRequest) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { business_id, scan_id } = await req.json()
     

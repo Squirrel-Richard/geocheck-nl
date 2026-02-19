@@ -130,7 +130,7 @@ export default function HomePage() {
               🚀 GEO = de nieuwe SEO — weet jij hoe je scoort?
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-black mb-6 leading-tight">
               Is jouw bedrijf<br />
               <span className="gradient-text">zichtbaar in ChatGPT?</span>
             </h1>
@@ -176,7 +176,7 @@ export default function HomePage() {
             style={{ background: 'rgba(124,58,237,0.05)', borderColor: 'rgba(124,58,237,0.2)' }}
           >
             <div className="text-sm text-gray-500 mb-4">Voorbeeld GEO Rapport — Bakkerij de Korrel, Amsterdam</div>
-            <div className="flex items-center justify-center gap-8">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
               <div className="text-center">
                 <div className="text-6xl font-black text-green-400">73</div>
                 <div className="text-sm text-gray-400 mt-1">GEO Score</div>

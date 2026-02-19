@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createServerClient } from '@/lib/supabase'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2026-01-28.clover' })
-
-const PRICE_IDS: Record<string, string> = {
-  mkb: process.env.STRIPE_PRICE_MKB || '',
-  bureau: process.env.STRIPE_PRICE_BUREAU || '',
-}
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2026-01-28.clover' })
+
+  const PRICE_IDS: Record<string, string> = {
+    mkb: process.env.STRIPE_PRICE_MKB || '',
+    bureau: process.env.STRIPE_PRICE_BUREAU || '',
+  }
+
   try {
     const { plan, business_id, email } = await req.json()
     
