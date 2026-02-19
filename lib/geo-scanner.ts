@@ -1,7 +1,9 @@
 import OpenAI from 'openai'
 import { RawResult, Suggestion } from '@/types'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'placeholder' })
+}
 
 // Generate 50 relevant Dutch questions for a business
 export function generateQuestions(name: string, category: string, city: string): string[] {
@@ -90,7 +92,7 @@ export function generateQuestions(name: string, category: string, city: string):
 // Query ChatGPT/OpenAI
 async function queryOpenAI(question: string, businessName: string): Promise<{ response: string; mentioned: boolean; sentiment: 'positief' | 'neutraal' | 'negatief' }> {
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
@@ -173,7 +175,7 @@ export async function generateSuggestions(
   try {
     const notMentionedQuestions = rawResults.filter(r => !r.mentioned).map(r => r.question).slice(0, 10).join('\n')
     
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
