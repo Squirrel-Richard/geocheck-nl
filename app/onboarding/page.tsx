@@ -3,6 +3,7 @@
 import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { getSupabase } from '@/lib/supabase'
 
 const CATEGORIES = [
   'Marketing bureau', 'Bouwbedrijf', 'Horecagelegenheid', 'Webshop', 'Advocatenkantoor',
@@ -50,14 +51,47 @@ function OnboardingContent() {
     setError('')
     
     try {
-      // For demo: create a mock user_id and redirect to dashboard
-      const mockUserId = crypto.randomUUID()
-      
+      const supabase = getSupabase()
+
+      // Step 1: Sign up the user with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: {
+          emailRedirectTo: 'https://geochecks.nl/dashboard',
+        },
+      })
+
+      if (authError) {
+        // Handle "user already exists" gracefully — try sign in
+        if (authError.message.includes('already registered') || authError.message.includes('already exists')) {
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: form.email,
+            password: form.password,
+          })
+          if (signInError) {
+            setError('E-mailadres al in gebruik. Controleer je wachtwoord.')
+            return
+          }
+          authData && Object.assign(authData, signInData)
+        } else {
+          setError(authError.message || 'Account aanmaken mislukt')
+          return
+        }
+      }
+
+      const userId = authData?.user?.id
+      if (!userId) {
+        setError('Account aanmaken mislukt. Probeer opnieuw.')
+        return
+      }
+
+      // Step 2: Create the business with the real user_id
       const res = await fetch('/api/businesses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: mockUserId,
+          user_id: userId,
           name: form.name,
           category: form.category,
           city: form.city,
@@ -69,12 +103,12 @@ function OnboardingContent() {
       const data = await res.json()
       
       if (!res.ok) {
-        setError(data.error || 'Er ging iets mis')
+        setError(data.error || 'Bedrijf aanmaken mislukt')
         return
       }
       
-      // Store in localStorage for demo
-      localStorage.setItem('gc_user_id', mockUserId)
+      // Store in localStorage
+      localStorage.setItem('gc_user_id', userId)
       localStorage.setItem('gc_business_id', data.business.id)
       localStorage.setItem('gc_business', JSON.stringify(data.business))
       
