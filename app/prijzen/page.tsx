@@ -123,15 +123,42 @@ export default function PrijzenPage() {
     },
   ]
 
+  // Deterministic stars
+  const STARS = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    x: ((i * 21.3 + 9.7) % 100),
+    y: ((i * 31.1 + 13.3) % 100),
+    size: (i % 3) + 1,
+    delay: (i * 0.33) % 5,
+    duration: 2.5 + (i % 4) * 0.75,
+  }))
+
   return (
-    <div className="min-h-screen" style={{ background: '#06060f' }}>
+    <div className="min-h-screen" style={{ background: '#030810' }}>
+      {/* Stars */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="orb absolute w-96 h-96 opacity-15" style={{ background: '#7c3aed', top: '-10%', right: '-10%' }} />
-        <div className="orb-2 orb absolute w-64 h-64 opacity-10" style={{ background: '#3b82f6', bottom: '-5%', left: '-5%' }} />
+        {STARS.map(s => (
+          <div key={s.id} className="star" style={{
+            left: `${s.x}%`, top: `${s.y}%`,
+            width: `${s.size}px`, height: `${s.size}px`,
+            animationDelay: `${s.delay}s`, animationDuration: `${s.duration}s`,
+          }} />
+        ))}
       </div>
+      {/* Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="orb absolute" style={{ width: '480px', height: '480px', opacity: 0.13, background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)', top: '-12%', right: '-12%' }} />
+        <div className="orb-2 orb absolute" style={{ width: '320px', height: '320px', opacity: 0.09, background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', bottom: '-8%', left: '-6%' }} />
+        <div className="orb-3 absolute" style={{ width: '240px', height: '240px', opacity: 0.07, background: 'radial-gradient(circle, #06b6d4 0%, transparent 70%)', top: '50%', left: '20%', borderRadius: '50%', filter: 'blur(60px)' }} />
+      </div>
+      {/* Planet arc */}
+      <div className="fixed top-0 left-0 right-0 pointer-events-none z-0 planet-arc" style={{
+        height: '280px',
+        background: 'radial-gradient(ellipse 80% 55% at 50% -18%, rgba(124,58,237,0.16) 0%, rgba(59,130,246,0.07) 50%, transparent 100%)',
+      }} />
 
       {/* Nav */}
-      <nav className="relative z-50 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(6,6,15,0.8)', backdropFilter: 'blur(12px)' }}>
+      <nav className="relative z-50 border-b" style={{ borderColor: 'rgba(124,58,237,0.15)', background: 'rgba(3,8,16,0.85)', backdropFilter: 'blur(12px)' }}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-xl font-black gradient-text">GeoCheck.nl</Link>
           <div className="flex items-center gap-3">

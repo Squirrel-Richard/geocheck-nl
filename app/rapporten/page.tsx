@@ -78,16 +78,49 @@ export default function RapportenPage() {
     }
   }
 
+  const STARS = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    x: ((i * 18.7 + 14.3) % 100),
+    y: ((i * 27.1 + 8.7) % 100),
+    size: (i % 3) + 1,
+    delay: (i * 0.29) % 5,
+    duration: 2.5 + (i % 4) * 0.7,
+  }))
+
   return (
-    <div className="min-h-screen" style={{ background: '#06060f' }}>
+    <div className="min-h-screen" style={{ background: '#030810' }}>
+      {/* Stars */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="orb absolute w-64 h-64 opacity-10" style={{ background: '#3b82f6', bottom: '20%', left: '15%' }} />
+        {STARS.map(s => (
+          <div key={s.id} className="star" style={{
+            left: `${s.x}%`, top: `${s.y}%`,
+            width: `${s.size}px`, height: `${s.size}px`,
+            animationDelay: `${s.delay}s`, animationDuration: `${s.duration}s`,
+          }} />
+        ))}
       </div>
+      {/* Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="orb-2 orb absolute" style={{ width: '320px', height: '320px', opacity: 0.09, background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', bottom: '15%', left: '10%' }} />
+        <div className="orb absolute" style={{ width: '400px', height: '400px', opacity: 0.1, background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)', top: '-10%', right: '-10%' }} />
+        <div className="orb-3 absolute" style={{ width: '220px', height: '220px', opacity: 0.07, background: 'radial-gradient(circle, #06b6d4 0%, transparent 70%)', top: '40%', right: '15%', borderRadius: '50%', filter: 'blur(55px)' }} />
+      </div>
+      {/* Planet arc */}
+      <div className="fixed top-0 left-0 right-0 pointer-events-none z-0 planet-arc" style={{
+        height: '260px',
+        background: 'radial-gradient(ellipse 70% 50% at 50% -15%, rgba(59,130,246,0.13) 0%, rgba(124,58,237,0.06) 50%, transparent 100%)',
+      }} />
 
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 z-40 flex flex-col" style={{ background: 'rgba(6,6,15,0.95)', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="p-6 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-          <Link href="/" className="text-xl font-black gradient-text">GeoCheck.nl</Link>
+      <div className="fixed left-0 top-0 h-full w-64 z-40 flex flex-col" style={{
+        background: 'rgba(3,8,16,0.97)',
+        borderRight: '1px solid rgba(124,58,237,0.15)',
+        boxShadow: '4px 0 24px rgba(0,0,0,0.4)',
+      }}>
+        <div className="p-6 border-b" style={{ borderColor: 'rgba(124,58,237,0.15)' }}>
+          <Link href="/" className="text-xl font-black gradient-text" style={{ filter: 'drop-shadow(0 0 8px rgba(124,58,237,0.4))' }}>
+            GeoCheck.nl
+          </Link>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {[
@@ -100,7 +133,12 @@ export default function RapportenPage() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${item.active ? 'bg-violet-600/20 text-white border border-violet-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${item.active ? 'text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              style={item.active ? {
+                background: 'linear-gradient(135deg, rgba(124,58,237,0.25), rgba(59,130,246,0.15))',
+                border: '1px solid rgba(124,58,237,0.35)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+              } : {}}
             >
               <span>{item.icon}</span>
               {item.label}
@@ -110,8 +148,13 @@ export default function RapportenPage() {
       </div>
 
       <div className="ml-64 relative z-10">
-        <div className="border-b px-8 py-4" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-          <h1 className="text-xl font-bold">E-mailrapporten</h1>
+        <div className="px-8 py-4" style={{
+          borderBottom: '1px solid rgba(124,58,237,0.15)',
+          background: 'rgba(3,8,16,0.8)',
+          backdropFilter: 'blur(12px)',
+          position: 'sticky', top: 0, zIndex: 30,
+        }}>
+          <h1 className="text-xl font-bold text-white">E-mailrapporten</h1>
           <p className="text-gray-400 text-sm">Wekelijkse GEO-rapporten in je inbox</p>
         </div>
 

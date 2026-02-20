@@ -4,6 +4,15 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 
+const STARS = Array.from({ length: 65 }, (_, i) => ({
+  id: i,
+  x: ((i * 16.9 + 11.1) % 100),
+  y: ((i * 25.3 + 6.7) % 100),
+  size: (i % 3) + 1,
+  delay: (i * 0.31) % 5,
+  duration: 2.5 + (i % 4) * 0.8,
+}))
+
 export default function HomePage() {
   const [email, setEmail] = useState('')
 
@@ -94,16 +103,32 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="min-h-screen" style={{ background: '#06060f' }}>
+    <div className="min-h-screen" style={{ background: '#030810' }}>
+      {/* Stars */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        {STARS.map(s => (
+          <div key={s.id} className="star" style={{
+            left: `${s.x}%`, top: `${s.y}%`,
+            width: `${s.size}px`, height: `${s.size}px`,
+            animationDelay: `${s.delay}s`, animationDuration: `${s.duration}s`,
+          }} />
+        ))}
+      </div>
       {/* Orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="orb absolute w-96 h-96 opacity-20" style={{ background: '#7c3aed', top: '-10%', left: '-10%' }} />
-        <div className="orb-2 orb absolute w-64 h-64 opacity-15" style={{ background: '#3b82f6', top: '40%', right: '-5%' }} />
-        <div className="orb absolute w-80 h-80 opacity-10" style={{ background: '#7c3aed', bottom: '-10%', left: '40%' }} />
+        <div className="orb absolute w-96 h-96 opacity-20" style={{ background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)', top: '-10%', left: '-10%' }} />
+        <div className="orb-2 orb absolute w-64 h-64 opacity-15" style={{ background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', top: '40%', right: '-5%' }} />
+        <div className="orb absolute w-80 h-80 opacity-10" style={{ background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)', bottom: '-10%', left: '40%' }} />
+        <div className="orb-3 absolute" style={{ width: '260px', height: '260px', opacity: 0.07, background: 'radial-gradient(circle, #06b6d4 0%, transparent 70%)', top: '60%', left: '60%', borderRadius: '50%', filter: 'blur(60px)' }} />
       </div>
+      {/* Planet arc */}
+      <div className="fixed top-0 left-0 right-0 pointer-events-none z-0 planet-arc" style={{
+        height: '350px',
+        background: 'radial-gradient(ellipse 90% 65% at 50% -20%, rgba(124,58,237,0.2) 0%, rgba(59,130,246,0.08) 55%, transparent 100%)',
+      }} />
 
       {/* Nav */}
-      <nav className="relative z-50 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(6,6,15,0.8)', backdropFilter: 'blur(12px)' }}>
+      <nav className="relative z-50 border-b" style={{ borderColor: 'rgba(124,58,237,0.15)', background: 'rgba(3,8,16,0.85)', backdropFilter: 'blur(12px)' }}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="text-xl font-black gradient-text">GeoCheck.nl</div>
           <div className="hidden md:flex items-center gap-8">
@@ -382,7 +407,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 py-12 px-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+      <footer className="relative z-10 py-12 px-6 border-t" style={{ borderColor: 'rgba(124,58,237,0.15)' }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="gradient-text font-black text-xl">GeoCheck.nl</div>
           <div className="flex gap-8">
